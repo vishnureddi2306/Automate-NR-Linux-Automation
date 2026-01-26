@@ -1,0 +1,9 @@
+---
+- name: AWX proof test
+  hosts: linux
+  gather_facts: no
+
+  tasks:
+    - name: Confirm execution
+      debug:
+        msg: "AWX is now executing user playbooks correctly"
