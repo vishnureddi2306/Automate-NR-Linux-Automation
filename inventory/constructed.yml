@@ -1,1 +1,13 @@
+plugin: constructed
+strict: False
 
+groups:
+
+  linux: os_family == "linux"
+  prod: nr_environment == "prod"
+  nprod: nr_environment == "nprod"
+  payments: nr_institution == "payments"
+
+compose:
+  environment: nr_environment
+  institution: nr_institution
