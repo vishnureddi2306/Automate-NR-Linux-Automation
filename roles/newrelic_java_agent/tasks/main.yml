@@ -1,0 +1,26 @@
+- name: Ensure unzip is installed
+  apt:
+    name: unzip
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: Create /opt directory if missing
+  file:
+    path: "{{ newrelic_install_dir }}"
+    state: directory
+
+- name: Download New Relic Java agent
+  get_url:
+    url: "{{ newrelic_zip_url }}"
+    dest: "{{ newrelic_install_dir }}/newrelic-java.zip"
+
+- name: Unzip New Relic agent
+  unarchive:
+    src: "{{ newrelic_install_dir }}/newrelic-java.zip"
+    dest: "{{ newrelic_install_dir }}"
+    remote_src: yes
+
+- name: Configure newrelic.yml
+  template:
+    src: newrelic.yml.j2
+    dest: "{{ newrelic_install_dir }}/newrelic/newrelic.yml"
