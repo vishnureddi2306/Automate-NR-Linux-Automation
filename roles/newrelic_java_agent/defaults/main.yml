@@ -1,3 +1,4 @@
 newrelic_install_dir: /opt
-newrelic_zip_url: https://download.newrelic.com/newrelic/java-agent/newrelic-agent/current/newrelic-java.zip
-newrelic_app_name: "Generic Java Application"
+newrelic_agent_dir: /opt/newrelic
+newrelic_zip_file: newrelic-java.zip
+newrelic_config: "{{ newrelic_agent_dir }}/newrelic.yml"
