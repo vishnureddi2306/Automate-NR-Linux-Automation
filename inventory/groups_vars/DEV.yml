@@ -1,2 +1,1 @@
-nr_environment: dev
-env_effective: nprod
+input_tag_Environment: dev
