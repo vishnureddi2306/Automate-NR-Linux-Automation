@@ -1,11 +1,11 @@
-- name: Ensure unzip is installed
+- name: Ensure unzip installed
   package:
     name: unzip
     state: present
 
-- name: Ensure /opt exists
+- name: Create installation directory
   file:
-    path: "{{ newrelic_install_dir }}"
+    path: "{{ newrelic_agent_dir }}"
     state: directory
     mode: '0755'
 
@@ -14,16 +14,25 @@
     url: "{{ newrelic_zip_url }}"
     dest: "{{ newrelic_install_dir }}/{{ newrelic_zip_file }}"
     mode: '0644'
-  register: download_agent
 
-- name: Unarchive New Relic agent
+- name: Unarchive agent
   unarchive:
     src: "{{ newrelic_install_dir }}/{{ newrelic_zip_file }}"
     dest: "{{ newrelic_install_dir }}"
     remote_src: yes
-  when: download_agent.changed
+    creates: "{{ newrelic_agent_dir }}/newrelic.jar"
 
-- name: Deploy newrelic.yml configuration
+- name: Determine license key
+  set_fact:
+    newrelic_license_key: >-
+      {{
+        lookup('env', 'NEW_RELIC_LICENSE_KEY_PROD')
+        if env_effective == 'prd'
+        else
+        lookup('env', 'NEW_RELIC_LICENSE_KEY_NPROD')
+      }}
+
+- name: Configure newrelic.yml
   template:
     src: newrelic.yml.j2
     dest: "{{ newrelic_config }}"
