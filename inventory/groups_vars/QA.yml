@@ -1,2 +1,1 @@
-nr_environment: qa
-env_effective: nprod
+input_tag_Environment: qa
