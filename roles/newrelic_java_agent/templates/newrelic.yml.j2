@@ -2,5 +2,9 @@ common: &default_settings
   license_key: {{ newrelic_license_key }}
   app_name: {{ newrelic_app_name }}
 
+  labels:
+    environment: {{ nr_environment }}
+    institution: {{ nr_institution }}
+
 production:
   <<: *default_settings
