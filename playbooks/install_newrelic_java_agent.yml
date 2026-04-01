@@ -1,5 +1,5 @@
 - name: Install New Relic Java Agent on Linux servers
-  hosts: linux
+  hosts: all
   become: true
 
   roles:
