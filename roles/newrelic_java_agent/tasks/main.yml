@@ -1,11 +1,11 @@
 ---
 - name: Normalize environment tag
   set_fact:
-    env_effective: "{{ nr_environment | default('nprod') | lower }}"
+    env_tag: "{{ input_tag_Environment | default('') | lower }}"
 
 - name: Normalize institution tag
   set_fact:
-    inst_tag: "{{ nr_institution | default('unknown') }}"
+    inst_tag: "{{ nr_institution | default('') }}"
 
 - name: Select license key
   set_fact:
