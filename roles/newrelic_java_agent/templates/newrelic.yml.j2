@@ -1,0 +1,6 @@
+common: &default_settings
+  license_key: {{ newrelic_license_key }}
+  app_name: {{ newrelic_app_name }}
+
+production:
+  <<: *default_settings
