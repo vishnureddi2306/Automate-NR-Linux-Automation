@@ -1,10 +1,7 @@
 ---
-- name: Normalize environment tag
+- name: Normalize tags
   set_fact:
     env_tag: "{{ input_tag_Environment | default('') | lower }}"
-
-- name: Normalize institution tag
-  set_fact:
     inst_tag: "{{ nr_institution | default('') }}"
 
 - name: Select license key
@@ -21,12 +18,6 @@
   package:
     name: unzip
     state: present
-
-- name: Ensure /opt directory exists
-  file:
-    path: /opt
-    state: directory
-    mode: '0755'
 
 - name: Ensure New Relic directory exists
   file:
@@ -58,7 +49,3 @@
     path: /opt/newrelic/newrelic.jar
   register: nr_agent
 
-- name: Debug installation status
-  debug:
-    msg: "New Relic Java agent installed successfully"
-  when: nr_agent.stat.exists
