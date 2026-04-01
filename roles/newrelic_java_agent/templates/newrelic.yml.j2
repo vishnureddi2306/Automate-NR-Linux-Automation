@@ -3,7 +3,7 @@ common: &default_settings
   app_name: "Generic Java Service"
 
   labels:
-    environment: {{ env_effective }}
+    environment: {{ env_tag }}
     institution: {{ inst_tag }}
 
 production:
