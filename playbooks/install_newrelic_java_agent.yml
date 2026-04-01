@@ -1,0 +1,6 @@
+- name: Install New Relic Java Agent
+  hosts: linux
+  become: true
+
+  roles:
+    - newrelic_java_agent
