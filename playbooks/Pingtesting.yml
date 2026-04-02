@@ -1,0 +1,17 @@
+---
+- name: Test connection to Linux hosts
+  hosts: all
+  gather_facts: false
+
+  tasks:
+
+    - name: Test SSH connectivity
+      ansible.builtin.ping:
+
+    - name: Show hostname of the server
+      ansible.builtin.command: hostname
+      register: hostname_output
+
+    - name: Display hostname
+      ansible.builtin.debug:
+        msg: "Connected successfully to {{ hostname_output.stdout }}"
