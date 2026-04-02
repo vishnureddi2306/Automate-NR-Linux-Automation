@@ -1,15 +1,15 @@
 ---
 - name: Normalize tags
   set_fact:
-    env_tag: "{{ input_tag_Environment | default('unknown') | lower }}"
-    inst_tag: "{{ nr_institution | default('unknown') }}"
+    env_tag: "{{ input_tag_Environment | default('') | lower }}"
+    inst_tag: "{{ nr_institution | default('') }}"
 
 - name: Select license key
   set_fact:
     newrelic_license_key: >-
       {{
         lookup('env', 'NEW_RELIC_LICENSE_KEY_PROD')
-        if env_effective == 'prd'
+        if env_tag == 'prd'
         else
         lookup('env', 'NEW_RELIC_LICENSE_KEY_NPROD')
       }}
