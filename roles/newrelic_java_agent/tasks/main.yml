@@ -23,7 +23,7 @@
   file:
     path: /opt/newrelic
     state: directory
-    mode: '0755'
+    mode: '0644'  #rw-r-r
 
 - name: Download New Relic Java agent
   get_url:
@@ -36,13 +36,13 @@
     src: /opt/newrelic-java.zip
     dest: /opt
     remote_src: yes    # To Specify The source file already exists on the remote Linux server, not on the control node. Else need to provide files/jar
-    creates: /opt/newrelic/newrelic.jar  # For idempotency, If this file already exists, skip the extraction.
+    creates: /opt/newrelic/newrelic.jar  # For idempotency, If this file already exists, skips extraction if the playbook ran again.
 
 - name: Configure newrelic.yml
   template:
     src: newrelic.yml.j2
     dest: /opt/newrelic/newrelic.yml
-    mode: '0644'
+    mode: '0644' 
     notify:
       - restart java services
 
