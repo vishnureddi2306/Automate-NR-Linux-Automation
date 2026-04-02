@@ -35,17 +35,14 @@
   unarchive:
     src: /opt/newrelic-java.zip
     dest: /opt
-    remote_src: yes
-    creates: /opt/newrelic/newrelic.jar
+    remote_src: yes    # To Specify The source file already exists on the remote Linux server, not on the control node. Else need to provide files/jar
+    creates: /opt/newrelic/newrelic.jar  # For idempotency, If this file already exists, skip the extraction.
 
 - name: Configure newrelic.yml
   template:
     src: newrelic.yml.j2
     dest: /opt/newrelic/newrelic.yml
     mode: '0644'
-
-- name: Check if newrelic.jar exists
-  stat:
-    path: /opt/newrelic/newrelic.jar
-  register: nr_agent
+    notify:
+      - restart java services
 
