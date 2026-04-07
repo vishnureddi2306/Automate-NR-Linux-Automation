@@ -1,4 +1,5 @@
 newrelic_install_dir: /opt
 newrelic_agent_dir: /opt/newrelic
-newrelic_zip_file: newrelic-java.zip
-newrelic_config: "{{ newrelic_agent_dir }}/newrelic.yml"
+tomcat_bin_dir: /sigma/tomcat/bin
+setenv_file: /sigma/tomcat/bin/setenv.sh
+sigma_user: sigqa
