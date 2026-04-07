@@ -43,14 +43,17 @@
     src: newrelic.yml.j2
     dest: /opt/newrelic/newrelic.yml
     mode: '0644' 
-    notify:
-      - restart java services
-
+  notify: 
+    - restart sigma services
+    - restart tomcat service
+    
 - name: Deploy setenv.sh for Tomcat
   template:
     src: setenv.sh.j2
     dest: /sigma/tomcat/bin/setenv.sh
     owner: sigqa
     mode: '0755'
-  notify: restart sigma services       
+  notify: 
+    - restart sigma services
+    - restart tomcat service
 
