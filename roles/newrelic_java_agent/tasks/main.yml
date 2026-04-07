@@ -46,3 +46,11 @@
     notify:
       - restart java services
 
+- name: Deploy setenv.sh for Tomcat
+  template:
+    src: setenv.sh.j2
+    dest: /sigma/tomcat/bin/setenv.sh
+    owner: sigqa
+    mode: '0755'
+  notify: restart sigma services       
+
