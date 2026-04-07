@@ -1,0 +1,3 @@
+NEWRELICAPM="-javaagent:/opt/newrelic/newrelic.jar -Dnewrelic.config.app_name='{{ env_tag }}' \
+-Dnewrelic.config.labels='environment:{{ env_tag }};institution:{{ inst_tag }};service:ServiceTag;team:TeamTag'"
+export CATALINA_OPTS="$NEWRELICAPM"
