@@ -1,5 +1,11 @@
 ---
-- name: restart java services
+- name: restart sigma services
+  become_user: sigqa
   shell: |
-    ps -eo pid,cmd | grep java | grep -v grep | awk '{print $1}' | xargs -r kill -HUP
-  listen: restart java services
+    /sigma/tomcat/bin/catalina.sh stop
+    /sigma/qa/bin/ixsqps_stop
+    /sigma/qa/bin/ssiapix_stop
+
+    /sigma/qa/bin/ssiapix_start
+    /sigma/qa/bin/ixsqps_start
+    /sigma/tomcat/bin/catalina.sh start
