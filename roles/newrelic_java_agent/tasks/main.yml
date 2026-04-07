@@ -45,7 +45,6 @@
     mode: '0644' 
   notify: 
     - restart sigma services
-    - restart tomcat service
     
 - name: Deploy setenv.sh for Tomcat
   template:
@@ -55,5 +54,4 @@
     mode: '0755'
   notify: 
     - restart sigma services
-    - restart tomcat service
 
