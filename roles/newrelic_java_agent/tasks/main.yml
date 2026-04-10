@@ -19,15 +19,15 @@
     name: unzip
     state: present
 
-- name: Ensure New Relic directory exists
+- name: Ensure /opt/newrelic directory exists
   file:
     path: /opt/newrelic
     state: directory
-    mode: '0644'  #rw-r-r
+    mode: '0644'
 
 - name: Download New Relic Java agent
   get_url:
-    url: https://download.newrelic.com/newrelic/java-agent/newrelic-agent/current/newrelic-java.zip
+    url: https://download.newrelic.com/newrelic/java-agent/newrelic-agent/8.2.0/newrelic-java.zip
     dest: /opt/newrelic-java.zip
     mode: '0644'
 
@@ -35,23 +35,14 @@
   unarchive:
     src: /opt/newrelic-java.zip
     dest: /opt
-    remote_src: yes    # To Specify The source file already exists on the remote Linux server, not on the control node. Else need to provide files/jar
-    creates: /opt/newrelic/newrelic.jar  # For idempotency, If this file already exists, skips extraction if the playbook ran again.
-
-- name: Configure newrelic.yml
-  template:
-    src: newrelic.yml.j2
-    dest: /opt/newrelic/newrelic.yml
-    mode: '0644' 
-  notify: 
+    remote_src: yes
+    creates: /opt/newrelic/newrelic.jar
+  
+- name: Update license key in newrelic.yml
+  lineinfile:
+    path: /opt/newrelic/newrelic.yml
+    regexp: '^license_key:'
+    line: "license_key: {{ newrelic_license_key }}"
+    backrefs: yes
+  notify:
     - restart sigma services
-    
-- name: Deploy setenv.sh for Tomcat
-  template:
-    src: setenv.sh.j2
-    dest: /sigma/tomcat/bin/setenv.sh
-    owner: sigqa
-    mode: '0755'
-  notify: 
-    - restart sigma services
-
