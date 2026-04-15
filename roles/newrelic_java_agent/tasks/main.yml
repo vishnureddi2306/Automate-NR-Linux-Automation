@@ -21,7 +21,7 @@
 
 - name: Ensure /opt/newrelic directory exists
   file:
-    path: /opt/newrelic
+    path: /opt
     state: directory
     mode: '0644'
 
