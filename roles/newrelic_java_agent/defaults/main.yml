@@ -1,5 +1,3 @@
-newrelic_install_dir: /opt
-newrelic_agent_dir: /opt/newrelic
 tomcat_bin_dir: /sigma/tomcat/bin
 setenv_file: /sigma/tomcat/bin/setenv.sh
 sigma_user: sigqa
