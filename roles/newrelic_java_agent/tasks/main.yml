@@ -19,25 +19,23 @@
     name: unzip
     state: present
 
-- name: Ensure /opt/newrelic directory exists
-  file:
-    path: /opt
-    state: directory
-    mode: '0644'
-
 - name: Download New Relic Java agent
   get_url:
     url: https://download.newrelic.com/newrelic/java-agent/newrelic-agent/8.20.0/newrelic-java.zip
     dest: /opt/newrelic-java.zip
     mode: '0644'
-    
-- name: UnZip New Relic agent
+
+- name: Remove existing New Relic agent
+  file:
+    path: /opt/newrelic
+    state: absent
+
+- name: Unzip New Relic agent
   unarchive:
     src: /opt/newrelic-java.zip
     dest: /opt
     remote_src: yes
-    creates: /opt/newrelic/newrelic.jar
-  
+
 - name: Replace New Relic license key placeholder
   become: yes
   replace:
@@ -45,6 +43,4 @@
     regexp: "<%= license_key %>"
     replace: "{{ newrelic_license_key }}"
   notify:
-    - restart sigma services  
-  
- 
+    - restart sigma services
