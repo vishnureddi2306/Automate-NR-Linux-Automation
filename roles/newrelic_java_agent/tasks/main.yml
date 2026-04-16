@@ -42,9 +42,12 @@
     dest: /opt
     remote_src: yes
   
-- name: Update license key in newrelic.yml
-  lineinfile:
+- name: Replace New Relic license key placeholder
+  become: yes
+  replace:
     path: /opt/newrelic/newrelic.yml
-    regexp: '^license_key:'
-    line: "license_key: {{ newrelic_license_key }}"
+    regexp: "<%= license_key %>"
+    replace: "{{ newrelic_license_key }}"
+  notify:
+    - restart sigma services
  
