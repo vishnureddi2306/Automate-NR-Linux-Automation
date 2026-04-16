@@ -25,7 +25,7 @@
     dest: /opt/newrelic-java.zip
     mode: '0644'
 
-- name: Remove old New Relic agent
+- name: Remove existing New Relic agent
   file:
     path: /opt/newrelic
     state: absent
@@ -36,19 +36,17 @@
     dest: /opt
     remote_src: yes
 
-- name: Replace New Relic license key
+- name: Replace license key in newrelic.yml
   replace:
     path: /opt/newrelic/newrelic.yml
     regexp: "<%= license_key %>"
     replace: "{{ newrelic_license_key }}"
-  notify:
-    - restart sigma services
 
 - name: Check installed New Relic agent version
   shell: unzip -p /opt/newrelic/newrelic.jar META-INF/MANIFEST.MF | grep Implementation-Version
-  register: nr_version
+  register: newrelic_version
   changed_when: false
 
-- name: Display installed agent version
+- name: Show installed agent version
   debug:
-    msg: "Installed New Relic Agent Version: {{ nr_version.stdout }}"
+    msg: "Installed New Relic Java Agent Version: {{ newrelic_version.stdout }}"
