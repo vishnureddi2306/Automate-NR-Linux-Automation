@@ -1,8 +1,8 @@
 ---
 - name: Normalize tags
   set_fact:
-    env_tag: "{{ input_tag_Environment | default('') | lower }}"
-    inst_tag: "{{ input_tag_institution | default('') }}"
+    env_tag: "{{ input_tag_Environment | default('Unknown') | lower }}"
+    inst_tag: "{{ input_tag_institution | default('Unknown') }}"
 
 - name: Select license key
   set_fact:
