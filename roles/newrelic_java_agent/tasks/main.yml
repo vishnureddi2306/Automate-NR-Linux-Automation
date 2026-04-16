@@ -31,12 +31,7 @@
     dest: /opt/newrelic-java.zip
     mode: '0644'
 
-- name: Remove existing New Relic agent
-  file:
-    path: /opt/newrelic
-    state: absent
-
-- name: Unarchive New Relic agent
+- name: UnZip New Relic agent
   unarchive:
     src: /opt/newrelic-java.zip
     dest: /opt
@@ -48,6 +43,5 @@
     path: /opt/newrelic/newrelic.yml
     regexp: "<%= license_key %>"
     replace: "{{ newrelic_license_key }}"
-  notify:
-    - restart sigma services
+  
  
