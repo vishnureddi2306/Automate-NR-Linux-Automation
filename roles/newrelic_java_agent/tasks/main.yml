@@ -47,6 +47,5 @@
     path: /opt/newrelic/newrelic.yml
     regexp: '^license_key:'
     line: "license_key: {{ newrelic_license_key }}"
-    backrefs: yes
   notify:
     - restart sigma services
