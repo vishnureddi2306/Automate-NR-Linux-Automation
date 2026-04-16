@@ -31,6 +31,11 @@
     dest: /opt/newrelic-java.zip
     mode: '0644'
 
+- name: Remove existing New Relic agent
+  file:
+    path: /opt/newrelic
+    state: absent
+
 - name: Unarchive New Relic agent
   unarchive:
     src: /opt/newrelic-java.zip
