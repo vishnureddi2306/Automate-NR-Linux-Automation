@@ -41,7 +41,6 @@
     src: /opt/newrelic-java.zip
     dest: /opt
     remote_src: yes
-    creates: /opt/newrelic/newrelic.jar
   
 - name: Update license key in newrelic.yml
   lineinfile:
