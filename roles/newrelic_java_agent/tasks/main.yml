@@ -30,12 +30,13 @@
     url: https://download.newrelic.com/newrelic/java-agent/newrelic-api/8.20.0/newrelic-java-8.20.0.zip
     dest: /opt/newrelic-java.zip
     mode: '0644'
-
+    
 - name: UnZip New Relic agent
   unarchive:
     src: /opt/newrelic-java.zip
     dest: /opt
     remote_src: yes
+    creates: /opt/newrelic/newrelic.jar
   
 - name: Replace New Relic license key placeholder
   become: yes
@@ -43,5 +44,7 @@
     path: /opt/newrelic/newrelic.yml
     regexp: "<%= license_key %>"
     replace: "{{ newrelic_license_key }}"
+  notify:
+    - restart sigma services  
   
  
