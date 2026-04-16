@@ -19,28 +19,36 @@
     name: unzip
     state: present
 
-- name: Download New Relic Java agent
+- name: Download New Relic Java agent 8.20.0
   get_url:
     url: https://download.newrelic.com/newrelic/java-agent/newrelic-agent/8.20.0/newrelic-java.zip
     dest: /opt/newrelic-java.zip
     mode: '0644'
 
-- name: Remove existing New Relic agent
+- name: Remove old New Relic agent
   file:
     path: /opt/newrelic
     state: absent
 
-- name: Unzip New Relic agent
+- name: Extract New Relic agent
   unarchive:
     src: /opt/newrelic-java.zip
     dest: /opt
     remote_src: yes
 
-- name: Replace New Relic license key placeholder
-  become: yes
+- name: Replace New Relic license key
   replace:
     path: /opt/newrelic/newrelic.yml
     regexp: "<%= license_key %>"
     replace: "{{ newrelic_license_key }}"
   notify:
     - restart sigma services
+
+- name: Check installed New Relic agent version
+  shell: unzip -p /opt/newrelic/newrelic.jar META-INF/MANIFEST.MF | grep Implementation-Version
+  register: nr_version
+  changed_when: false
+
+- name: Display installed agent version
+  debug:
+    msg: "Installed New Relic Agent Version: {{ nr_version.stdout }}"
