@@ -2,16 +2,12 @@
 - name: restart sigma services
   become: true
   shell: |
-    echo "Stopping services..."
-
-    su - sigqa -c "sh /sigma/tomcat/bin/catalina.sh stop"
-    su - sigqa -c "sh /sigma/qa/bin/ixsqps_stop"
-    su - sigqa -c "sh /sigma/qa/bin/ssiapix_stop"
-
-    sleep 5
-
-    echo "Starting services..."
-
-    su - sigqa -c "sh /sigma/qa/bin/ssiapix_start"
-    su - sigqa -c "sh /sigma/qa/bin/ixsqps_start"
+    echo "Stopping services..." && \
+    su - sigqa -c "sh /sigma/tomcat/bin/catalina.sh stop" && \
+    su - sigqa -c "sh /sigma/qa/bin/ixsqps_stop" && \
+    su - sigqa -c "sh /sigma/qa/bin/ssiapix_stop" && \
+    sleep 5 && \
+    echo "Starting services..." && \
+    su - sigqa -c "sh /sigma/qa/bin/ssiapix_start" && \
+    su - sigqa -c "sh /sigma/qa/bin/ixsqps_start" && \
     su - sigqa -c "sh /sigma/tomcat/bin/catalina.sh start"
