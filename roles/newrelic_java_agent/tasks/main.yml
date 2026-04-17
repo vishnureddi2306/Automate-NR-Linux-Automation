@@ -24,13 +24,13 @@
     url: https://download.newrelic.com/newrelic/java-agent/newrelic-agent/8.21.0/newrelic-java-8.21.0.zip
     dest: /opt/newrelic-java.zip
     mode: '0644'
+    force: yes
 
 - name: Extract New Relic agent
   unarchive:
     src: /opt/newrelic-java.zip
     dest: /opt
     remote_src: yes
-    creates: "/opt/newrelic/newrelic.jar"
 
 - name: Replace license key in newrelic.yml
   replace:
