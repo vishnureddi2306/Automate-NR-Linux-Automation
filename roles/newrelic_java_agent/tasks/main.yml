@@ -37,5 +37,5 @@
     path: /opt/newrelic/newrelic.yml
     regexp: "<%= license_key %>"
     replace: "{{ newrelic_license_key }}"
-  notify: restart sigma services  
+    
 
