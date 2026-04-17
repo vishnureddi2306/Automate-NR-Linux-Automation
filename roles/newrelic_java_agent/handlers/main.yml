@@ -1,11 +1,14 @@
 ---
 - name: restart sigma services
   become_user: sigqa
+  become: true
   shell: |
     /sigma/tomcat/bin/catalina.sh stop
     /sigma/qa/bin/ixsqps_stop
     /sigma/qa/bin/ssiapix_stop
-
+    
+    sleep 5
+    
     /sigma/qa/bin/ssiapix_start
     /sigma/qa/bin/ixsqps_start
     /sigma/tomcat/bin/catalina.sh start
