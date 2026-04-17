@@ -41,15 +41,8 @@
     path: /opt/newrelic/newrelic.yml
     regexp: "<%= license_key %>"
     replace: "{{ newrelic_license_key }}"
-
-- name: Deploy setenv.sh
-  template:
-    src: setenv.sh.j2
-    dest: /sigma/tomcat/bin/setenv.sh
-    owner: sigqa
-    mode: '0755'
   notify:
-    - restart sigma services    
+    - restart sigma services  
 
 - name: Check installed New Relic agent version
   shell: unzip -p /opt/newrelic/newrelic.jar META-INF/MANIFEST.MF | grep Implementation-Version
