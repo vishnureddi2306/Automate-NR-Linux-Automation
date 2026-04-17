@@ -39,11 +39,3 @@
     replace: "{{ newrelic_license_key }}"
   notify: restart sigma services  
 
-- name: Check installed New Relic agent version
-  shell: unzip -p /opt/newrelic/newrelic.jar META-INF/MANIFEST.MF | grep Implementation-Version
-  register: newrelic_version
-  changed_when: false
-
-- name: Show installed agent version
-  debug:
-    msg: "Installed New Relic Java Agent Version: {{ newrelic_version.stdout }}"
