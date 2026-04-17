@@ -30,7 +30,7 @@
     src: /opt/newrelic-java.zip
     dest: /opt
     remote_src: yes
-    creates: "opt/newrelic/newrelic.jar"
+    creates: "/opt/newrelic/newrelic.jar"
 
 - name: Replace license key in newrelic.yml
   replace:
