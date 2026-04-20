@@ -57,6 +57,6 @@
   lineinfile:
     path: /opt/newrelic/newrelic.yml
     regexp: "license_key:.*"
-    line: "license_key: '{{ newrelic_license_key }}'"
+    line: "license_key: {{ newrelic_license_key }}"
   when: extract_result.changed
   notify: restart tomcat
