@@ -21,7 +21,7 @@
 
 - name: Set New Relic version
   set_fact:
-    nr_version: "8.22.0"
+    nr_version: "8.23.0"
 
 - name: Download New Relic Java agent
   get_url:
