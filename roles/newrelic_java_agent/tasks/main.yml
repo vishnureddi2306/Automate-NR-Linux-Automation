@@ -21,7 +21,7 @@
 
 - name: Download New Relic Java agent 
   get_url:
-    url: https://download.newrelic.com/newrelic/java-agent/newrelic-agent/8.21.0/newrelic-java-8.21.0.zip
+    url: https://download.newrelic.com/newrelic/java-agent/newrelic-agent/8.20.0/newrelic-java-8.20.0.zip
     dest: /opt/newrelic-java.zip
     mode: '0644'
     force: yes
