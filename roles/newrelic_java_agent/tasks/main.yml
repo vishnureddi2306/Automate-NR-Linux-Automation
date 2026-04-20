@@ -39,6 +39,6 @@
 - name: Update license key
   lineinfile:
     path: /opt/newrelic/newrelic.yml
-    regexp: '^\s*license_key:'
+    regexp: 'license_key:.*'
     line: "license_key: {{ newrelic_license_key }}"
   notify: restart tomcat
