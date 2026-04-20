@@ -21,7 +21,7 @@
 
 - name: Set New Relic version
   set_fact:
-    nr_version: "8.22.0"
+    nr_version: "8.24.0"
 
 - name: Download New Relic Java agent
   get_url:
@@ -34,12 +34,12 @@
     src: "/opt/newrelic-java-{{ nr_version }}.zip"
     dest: /opt
     remote_src: yes
+    creates: /opt/newrelic/newrelic.jar
   register: extract_result
 
 - name: Update license key
   lineinfile:
     path: /opt/newrelic/newrelic.yml
     regexp: 'license_key:.*'
-    line: "license_key: {{ newrelic_license_key }}"
-  when: extract_result.changed
+    line: "  license_key: {{ newrelic_license_key }}"
   notify: restart tomcat
