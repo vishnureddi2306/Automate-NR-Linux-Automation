@@ -35,11 +35,12 @@
     dest: /opt
     remote_src: yes
   register: agent_version
+  creates: /opt/newrelic/newrelic.jar
 
 - name: Update license key
   lineinfile:
     path: /opt/newrelic/newrelic.yml
-    regexp: '^license_key:'
+    regexp: '<%= license_key %>'
     line: "license_key: {{ newrelic_license_key }}"
   when: agent_version.changed
   notify: restart tomcat
