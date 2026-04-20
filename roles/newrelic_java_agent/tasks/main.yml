@@ -14,49 +14,32 @@
         lookup('env', 'NEW_RELIC_LICENSE_KEY_NPROD')
       }}
 
-- name: Set version
-  set_fact:
-    nr_version: "8.25.0"      
-
 - name: Ensure unzip is installed
   package:
     name: unzip
     state: present
 
-- name: Check installed version
-  shell: unzip -p /opt/newrelic/newrelic.jar META-INF/MANIFEST.MF | grep Implementation-Version
-  register: current_version
-  ignore_errors: true
-  changed_when: false
-
-- name: Determine if upgrade required
+- name: Set New Relic version
   set_fact:
-    upgrade_required: "{{ nr_version not in current_version.stdout | default('') }}"
+    nr_version: "8.22.0"
 
-- name: Download New Relic agent
+- name: Download New Relic Java agent
   get_url:
     url: "https://download.newrelic.com/newrelic/java-agent/newrelic-agent/{{ nr_version }}/newrelic-java-{{ nr_version }}.zip"
     dest: "/opt/newrelic-java-{{ nr_version }}.zip"
-  when: upgrade_required
+    mode: '0644'
 
-- name: Remove old agent
-  file:
-    path: /opt/newrelic
-    state: absent
-  when: upgrade_required
-
-- name: Extract agent
+- name: Extract New Relic agent
   unarchive:
     src: "/opt/newrelic-java-{{ nr_version }}.zip"
     dest: /opt
     remote_src: yes
-  when: upgrade_required
   register: extract_result
 
 - name: Update license key
   lineinfile:
     path: /opt/newrelic/newrelic.yml
-    regexp: "license_key:.*"
+    regexp: 'license_key:.*'
     line: "license_key: {{ newrelic_license_key }}"
   when: extract_result.changed
   notify: restart tomcat
