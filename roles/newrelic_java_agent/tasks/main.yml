@@ -16,7 +16,7 @@
 
 - name: Set version
   set_fact:
-    nr_version: "8.24.0"      
+    nr_version: "8.25.0"      
 
 - name: Ensure unzip is installed
   package:
