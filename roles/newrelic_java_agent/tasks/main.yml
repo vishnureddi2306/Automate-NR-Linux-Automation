@@ -40,5 +40,5 @@
   replace:
     path: /opt/newrelic/newrelic.yml
     regexp: 'license_key:.*'
-    line: "license_key: {{ newrelic_license_key }}"
+    replace: "license_key: {{ newrelic_license_key }}"
   notify: restart tomcat
