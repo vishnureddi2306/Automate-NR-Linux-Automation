@@ -37,7 +37,7 @@
     creates: /opt/newrelic/newrelic.jar  
 
 - name: Update license key
-  lineinfile:
+  replace:
     path: /opt/newrelic/newrelic.yml
     regexp: 'license_key:.*'
     line: "license_key: {{ newrelic_license_key }}"
