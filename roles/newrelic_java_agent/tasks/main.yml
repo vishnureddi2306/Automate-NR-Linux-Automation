@@ -56,11 +56,3 @@
     line: "  license_key: {{ newrelic_license_key }}"
   when: upgrade_required
   notify: restart tomcat
-
-- name: Update app name
-  lineinfile:
-    path: /opt/newrelic/newrelic.yml
-    regexp: '^\s*app_name:'
-    line: "  app_name: {{ env_tag }}-{{ inst_tag }}-tomcat"
-  when: upgrade_required
-  notify: restart tomcat
