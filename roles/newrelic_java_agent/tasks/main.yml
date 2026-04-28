@@ -16,7 +16,7 @@
 
 - name: Set desired New Relic version
   set_fact:
-    nr_version: "8.2.0"
+    nr_version: "8.20.0"
 
 - name: Get current agent version
   shell: unzip -p /opt/newrelic/newrelic.jar META-INF/MANIFEST.MF | grep Implementation-Version
