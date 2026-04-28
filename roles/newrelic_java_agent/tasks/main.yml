@@ -14,11 +14,11 @@
         lookup('env', 'NEW_RELIC_LICENSE_KEY_NPROD')
       }}
 
-- name: Set desired New Relic version
+- name: Set NewRelic version
   set_fact:
     nr_version: "8.20.0"
 
-- name: Get current agent version
+- name: Current agent version
   shell: unzip -p /opt/newrelic/newrelic.jar META-INF/MANIFEST.MF | grep Implementation-Version
   register: current_version
   failed_when: false
