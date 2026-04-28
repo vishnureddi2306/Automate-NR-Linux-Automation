@@ -1,8 +1,8 @@
 ---
 - name: Normalize tags
   set_fact:
-    env_tag: "{{ input_tag_Environment | default('Unknown') | lower }}"
-    inst_tag: "{{ input_tag_institution | default('Unknown') }}"
+    env_tag: "{{ input_tag_Environment | default('unknown') | lower }}"
+    inst_tag: "{{ input_tag_institution | default('unknown') }}"
 
 - name: Select license key
   set_fact:
@@ -14,32 +14,53 @@
         lookup('env', 'NEW_RELIC_LICENSE_KEY_NPROD')
       }}
 
-- name: Ensure unzip is installed
-  package:
-    name: unzip
-    state: present
-
-- name: Set New Relic version
+- name: Set desired New Relic version
   set_fact:
-    nr_version: "8.24.0"
+    nr_version: "8.2.0"
 
-- name: Download New Relic Java agent
+- name: Get current agent version
+  shell: unzip -p /opt/newrelic/newrelic.jar META-INF/MANIFEST.MF | grep Implementation-Version
+  register: current_version
+  failed_when: false
+  changed_when: false
+
+- name: Determine upgrade requirement
+  set_fact:
+    upgrade_required: "{{ nr_version not in current_version.stdout | default('') }}"
+
+- name: Download New Relic agent
   get_url:
     url: "https://download.newrelic.com/newrelic/java-agent/newrelic-agent/{{ nr_version }}/newrelic-java-{{ nr_version }}.zip"
     dest: "/opt/newrelic-java-{{ nr_version }}.zip"
     mode: '0644'
+  when: upgrade_required
+
+- name: Remove old New Relic agent
+  file:
+    path: /opt/newrelic
+    state: absent
+  when: upgrade_required
 
 - name: Extract New Relic agent
   unarchive:
     src: "/opt/newrelic-java-{{ nr_version }}.zip"
     dest: /opt
     remote_src: yes
-    creates: /opt/newrelic/newrelic.jar
+  when: upgrade_required
   register: extract_result
 
 - name: Update license key
   lineinfile:
     path: /opt/newrelic/newrelic.yml
-    regexp: 'license_key:.*'
+    regexp: '^\s*license_key:'
     line: "  license_key: {{ newrelic_license_key }}"
+  when: upgrade_required
+  notify: restart tomcat
+
+- name: Update app name
+  lineinfile:
+    path: /opt/newrelic/newrelic.yml
+    regexp: '^\s*app_name:'
+    line: "  app_name: {{ env_tag }}-{{ inst_tag }}-tomcat"
+  when: upgrade_required
   notify: restart tomcat
