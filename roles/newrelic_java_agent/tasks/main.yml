@@ -3,6 +3,7 @@
   set_fact:
     env_tag: "{{ input_tag_Environment | default('unknown') | lower }}"
     inst_tag: "{{ input_tag_institution | default('unknown') }}"
+    app_name: "{{ app_name | default('unknown') }}"
 
 - name: Select license key
   set_fact:
@@ -56,3 +57,11 @@
     line: "  license_key: {{ newrelic_license_key }}"
   when: upgrade_required
   notify: restart tomcat
+
+- name: Update AppName
+  lineinfile:
+    path: /opt/newrelic/newrelic.yml
+    regexp: '^\s*app_name:'
+    line: "  app_name: {{ app_name }}"
+  when: upgrade_required
+  notify: restart tomcat  
