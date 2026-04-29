@@ -63,5 +63,6 @@
     path: /opt/newrelic/newrelic.yml
     regexp: '^\s*app_name:'
     line: "  app_name: {{ app_name }}"
+    firstmatch: yes
   when: upgrade_required
   notify: restart tomcat  
