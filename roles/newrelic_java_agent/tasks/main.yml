@@ -1,4 +1,9 @@
 ---
+- name: Validate New Relic version input
+  fail:
+    msg: "nr_version was not provided from AWX/Tower survey"
+  when: nr_version is not defined
+  
 - name: Normalize tags
   set_fact:
     env_tag: "{{ input_tag_Environment | default('unknown') | lower }}"
