@@ -3,7 +3,7 @@
   set_fact:
     env_tag: "{{ input_tag_Environment | default('unknown') | lower }}"
     inst_tag: "{{ input_tag_institution | default('unknown') }}"
-    app_name: "{{ app_name | default('unknown') }}"
+    app_name: "{{ input_app_name | default('unknown') }}"
 
 - name: Select license key
   set_fact:
@@ -14,55 +14,75 @@
         else
         lookup('env', 'NEW_RELIC_LICENSE_KEY_NPROD')
       }}
+----------------------------------------------------------------------------------------------------------------------------------------------
+- name: Check if New Relic agent exists
+  stat:
+    path: /opt/newrelic/newrelic.jar
+  register: nr_agent
 
-- name: Set NewRelic version
-  set_fact:
-    nr_version: "8.24.0"
-
-- name: Current agent version
-  shell: unzip -p /opt/newrelic/newrelic.jar META-INF/MANIFEST.MF | grep Implementation-Version
+- name: Get installed version
+  shell: unzip -p /opt/newrelic/newrelic.jar META-INF/MANIFEST.MF | grep '^Implementation-Version'
   register: current_version
   failed_when: false
   changed_when: false
+  when: nr_agent.stat.exists
+
+----------------------------------------------------
+Determine install/upgrade requirement
+----------------------------------------------------
 
 - name: Determine upgrade requirement
   set_fact:
-    upgrade_required: "{{ nr_version not in current_version.stdout | default('') }}"
+    upgrade_required: >-
+      {{
+        (not nr_agent.stat.exists)
+        or
+        (current_version.stdout is not search(nr_version))
+      }}
 
-- name: Download New Relic agent
-  get_url:
-    url: "https://download.newrelic.com/newrelic/java-agent/newrelic-agent/{{ nr_version }}/newrelic-java-{{ nr_version }}.zip"
-    dest: "/opt/newrelic-java.zip"
-    mode: '0644'
-  when: upgrade_required
+# ----------------------------------------------------
+# Install / Upgrade Block
+# ----------------------------------------------------
 
-- name: Remove old New Relic agent
-  file:
-    path: /opt/newrelic
-    state: absent
-  when: upgrade_required
+- name: Install or upgrade New Relic agent
+  block:
 
-- name: Extract New Relic agent
-  unarchive:
-    src: "/opt/newrelic-java.zip"
-    dest: /opt
-    remote_src: yes
-  when: upgrade_required
-  register: extract_result
+    - name: Download New Relic agent
+      get_url:
+        url: "https://download.newrelic.com/newrelic/java-agent/newrelic-agent/{{ nr_version }}/newrelic-java-{{ nr_version }}.zip"
+        dest: "/opt/newrelic-java.zip"
+        mode: '0644'
 
-- name: Update license key
-  lineinfile:
-    path: /opt/newrelic/newrelic.yml
-    regexp: '^\s*license_key:'
-    line: "  license_key: {{ newrelic_license_key }}"
-  when: upgrade_required
-  notify: restart tomcat
+    - name: Remove existing New Relic agent
+      file:
+        path: /opt/newrelic
+        state: absent
 
-- name: Update AppName
-  lineinfile:
-    path: /opt/newrelic/newrelic.yml
-    regexp: '^\s*app_name:'
-    line: "  app_name: {{ app_name }}"
-    firstmatch: yes
+    - name: Extract New Relic agent
+      unarchive:
+        src: "/opt/newrelic-java.zip"
+        dest: /opt
+        remote_src: yes
+
+    - name: Update license key
+      lineinfile:
+        path: /opt/newrelic/newrelic.yml
+        regexp: '^\s*license_key:'
+        line: "  license_key: {{ newrelic_license_key }}"
+
+    - name: Update app name
+      lineinfile:
+        path: /opt/newrelic/newrelic.yml
+        regexp: 'app_name:'
+        line: "  app_name: {{ app_name }}"
+        firstmatch: yes
+
+    - name: Restart Tomcat
+      shell: |
+        /opt/tomcat/bin/shutdown.sh || true
+        sleep 10
+        /opt/tomcat/bin/startup.sh
+      args:
+        executable: /bin/bash
+
   when: upgrade_required
-  notify: restart tomcat  
