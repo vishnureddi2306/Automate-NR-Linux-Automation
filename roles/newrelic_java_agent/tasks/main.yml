@@ -19,7 +19,7 @@
         else
         lookup('env', 'NEW_RELIC_LICENSE_KEY_NPROD')
       }}
-----------------------------------------------------------------------------------------------------------------------------------------------
+
 - name: Check if New Relic agent exists
   stat:
     path: /opt/newrelic/newrelic.jar
@@ -32,10 +32,6 @@
   changed_when: false
   when: nr_agent.stat.exists
 
-----------------------------------------------------
-Determine install/upgrade requirement
-----------------------------------------------------
-
 - name: Determine upgrade requirement
   set_fact:
     upgrade_required: >-
@@ -44,10 +40,6 @@ Determine install/upgrade requirement
         or
         (current_version.stdout is not search(nr_version))
       }}
-
-# ----------------------------------------------------
-# Install / Upgrade Block
-# ----------------------------------------------------
 
 - name: Install or upgrade New Relic agent
   block:
