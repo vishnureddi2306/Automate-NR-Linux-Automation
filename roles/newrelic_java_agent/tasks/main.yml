@@ -49,6 +49,7 @@
         url: "https://download.newrelic.com/newrelic/java-agent/newrelic-agent/{{ nr_version }}/newrelic-java-{{ nr_version }}.zip"
         dest: "/opt/newrelic-java.zip"
         mode: '0644'
+        force: yes   #forcing the replace the file because it's already existed and not allowing to download latest agent file.{Because of same file name}
 
     - name: Remove existing New Relic agent
       file:
