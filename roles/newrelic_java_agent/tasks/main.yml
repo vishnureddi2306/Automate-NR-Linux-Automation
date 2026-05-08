@@ -12,13 +12,7 @@
 
 - name: Select license key
   set_fact:
-    newrelic_license_key: >-
-      {{
-        lookup('env', 'NEW_RELIC_LICENSE_KEY_PROD')
-        if env_tag == 'prd'
-        else
-        lookup('env', 'NEW_RELIC_LICENSE_KEY_NPROD')
-      }}
+    newrelic_license_key: "{{ lookup('env', 'NEW_RELIC_LICENSE_KEY_PROD') if env_tag == 'prd' else lookup('env', 'NEW_RELIC_LICENSE_KEY_NPROD') }}"
 
 - name: Check if New Relic agent exists
   ansible.builtin.stat:                           # Helps to Retrieve file or file system status
@@ -33,13 +27,8 @@
   when: nr_agent.stat.exists
 
 - name: Determine upgrade requirement
-  set_fact:
-    upgrade_required: >-
-      {{
-        (not nr_agent.stat.exists)                # condition: upgrade? not true or current version != nr_version
-        or
-        (current_version.stdout is not search(nr_version))
-      }}
+  set_fact:                                       # condition: upgrade? not true or current version != nr_version
+    upgrade_required: "{{ (not nr_agent.stat.exists) or (current_version.stdout is not search(nr_version)) }}"
 
 - name: Install or upgrade New Relic agent
   block:
