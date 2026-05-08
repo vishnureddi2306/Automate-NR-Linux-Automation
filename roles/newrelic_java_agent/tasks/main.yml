@@ -72,7 +72,7 @@
     - name: Update app name
       lineinfile:
         path: /opt/newrelic/newrelic.yml
-        regexp: 'app_name:'
+        regexp: '^\s*app_name:'
         line: "  app_name: {{ app_name }}"
         firstmatch: yes
 
