@@ -21,22 +21,22 @@
       }}
 
 - name: Check if New Relic agent exists
-  stat:
+  ansible.builtin.stat:                           # Helps to Retrieve file or file system status
     path: /opt/newrelic/newrelic.jar
   register: nr_agent
 
 - name: Get installed version
-  shell: unzip -p /opt/newrelic/newrelic.jar META-INF/MANIFEST.MF | grep '^Implementation-Version'
+  shell: unzip -p /opt/newrelic/newrelic.jar META-INF/MANIFEST.MF | grep '^Implementation-Version'  # version check command
   register: current_version
-  failed_when: false
-  changed_when: false
+  failed_when: false                              # Error Handlings , we can define the failures
+  changed_when: false                             # Error Handlings , REports change and triggers Ansible handlers
   when: nr_agent.stat.exists
 
 - name: Determine upgrade requirement
   set_fact:
     upgrade_required: >-
       {{
-        (not nr_agent.stat.exists)
+        (not nr_agent.stat.exists)                # condition: upgrade? not true or current version != nr_version
         or
         (current_version.stdout is not search(nr_version))
       }}
@@ -49,7 +49,8 @@
         url: "https://download.newrelic.com/newrelic/java-agent/newrelic-agent/{{ nr_version }}/newrelic-java-{{ nr_version }}.zip"
         dest: "/opt/newrelic-java.zip"
         mode: '0644'
-        force: yes   #forcing the replace the file because it's already existed and not allowing to download latest agent file.{Because of same file name}
+        force: yes                                #forcing the replace the file because it's already exist and not allow to download latest agent file.
+                                                  #{Because of same file name and to avoid 304 Not modified error}
 
     - name: Remove existing New Relic agent
       file:
@@ -76,7 +77,9 @@
         firstmatch: yes
 
     - name: Restart Tomcat
-      shell: |
+      ansible.builtin.shell: |
+        /opt/tomcat/bin/shutdown.sh || true
+        sleep 5
         /opt/tomcat/bin/shutdown.sh || true
         sleep 10
         /opt/tomcat/bin/startup.sh
