@@ -1,0 +1,8 @@
+---
+- name: Create startup integration
+  template:
+    src: "{{ app_config.setenv_template }}"
+    dest: "{{ app_config.tomcat_path }}/bin/setenv.sh"
+    mode: '0755'
+  when: upgrade_required
+  notify: "{{ app_config.restart_handler }}"
