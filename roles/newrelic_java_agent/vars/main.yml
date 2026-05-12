@@ -1,0 +1,12 @@
+application_configs:
+
+  standard:
+    tomcat_path: /opt/tomcat
+    setenv_template: setenv_standard.sh.j2
+    restart_handler: restart standard tomcat
+
+  ProSAM:
+    tomcat_path: /sigma/tomcat
+    setenv_template: setenv_prosam.sh.j2
+    restart_handler: restart prosam services
+    service_user: sigqa
