@@ -1,0 +1,30 @@
+---
+- name: Validate New Relic version input
+  fail:
+    msg: "nr_version not provided"
+  when: nr_version is not defined
+
+- name: Validate application type
+  fail:
+    msg: "Unsupported application_type"
+  when: application_type not in application_configs
+
+- name: Normalize variables
+  set_fact:
+    env_tag: "{{ input_tag_Environment | default('unknown') | lower }}"
+    inst_tag: "{{ input_tag_institution | default('unknown') }}"
+    app_name: "{{ input_app_name | default('unknown') }}"
+
+- name: Select New Relic license key
+  set_fact:
+    newrelic_license_key: >-
+      {{
+        lookup('env', 'NEW_RELIC_LICENSE_KEY_PROD')
+        if env_tag == 'prd'
+        else
+        lookup('env', 'NEW_RELIC_LICENSE_KEY_NPROD')
+      }}
+
+- name: Load application configuration
+  set_fact:
+    app_config: "{{ application_configs[application_type] }}"
