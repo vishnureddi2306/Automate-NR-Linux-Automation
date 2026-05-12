@@ -1,6 +1,25 @@
 ---
-- name: restart tomcat
+- name: restart standard tomcat
   shell: |
-    sh /opt/tomcat/bin/shutdown.sh || true
-    sleep 3
-    sh /opt/tomcat/bin/startup.sh
+    /opt/tomcat/bin/shutdown.sh || true
+    sleep 10
+    /opt/tomcat/bin/startup.sh
+  args:
+    executable: /bin/bash
+
+- name: restart prosam services
+  become_user: sigqa
+  shell: |
+    /sigma/tomcat/bin/catalina.sh stop || true
+
+    /sigma/qa/bin/ixsqps_stop || true
+    /sigma/qa/bin/ssiapix_stop || true
+
+    sleep 5
+
+    /sigma/qa/bin/ssiapix_start
+    /sigma/qa/bin/ixsqps_start
+
+    /sigma/tomcat/bin/catalina.sh start
+  args:
+    executable: /bin/bash
