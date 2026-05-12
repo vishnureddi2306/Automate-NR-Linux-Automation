@@ -1,0 +1,39 @@
+---
+- name: Check if New Relic agent exists
+  stat:
+    path: /opt/newrelic/newrelic.jar
+  register: nr_agent
+
+- name: Get installed version
+  shell: unzip -p /opt/newrelic/newrelic.jar META-INF/MANIFEST.MF | grep '^Implementation-Version'
+  register: current_version
+  failed_when: false
+  changed_when: false
+  when: nr_agent.stat.exists
+
+- name: Determine upgrade requirement
+  set_fact:
+    upgrade_required: "{{ (not nr_agent.stat.exists) or (current_version.stdout is not search(nr_version)) }}"
+
+- name: Install or upgrade agent
+  block:
+
+    - name: Download New Relic Java agent
+      get_url:
+        url: "https://download.newrelic.com/newrelic/java-agent/newrelic-agent/{{ nr_version }}/newrelic-java-{{ nr_version }}.zip"
+        dest: /opt/newrelic-java.zip
+        force: yes
+        mode: '0644'
+
+    - name: Remove existing New Relic directory
+      file:
+        path: /opt/newrelic
+        state: absent
+
+    - name: Extract New Relic Java agent
+      unarchive:
+        src: /opt/newrelic-java.zip
+        dest: /opt
+        remote_src: yes
+
+  when: upgrade_required
