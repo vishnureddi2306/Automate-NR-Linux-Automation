@@ -1,3 +1,5 @@
+#!/bin/bash
+
 NEWRELIC_OPTS="-javaagent:/opt/newrelic/newrelic.jar \-Dnewrelic.config.file=/opt/newrelic/newrelic.yml"
 
 export CATALINA_OPTS="$CATALINA_OPTS $NEWRELIC_OPTS"
