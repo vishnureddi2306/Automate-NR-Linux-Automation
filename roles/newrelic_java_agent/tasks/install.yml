@@ -36,4 +36,17 @@
         dest: /opt
         remote_src: yes
 
+    - name: Update New Relic license key
+      lineinfile:
+        path: /opt/newrelic/newrelic.yml
+        regexp: '^\s*license_key:'
+        line: "  license_key: {{ newrelic_license_key }}"
+
+    - name: Update New Relic application name
+      lineinfile:
+        path: /opt/newrelic/newrelic.yml
+        regexp: '^\s*app_name:'
+        line: "  app_name: {{ app_name }}"
+        firstmatch: yes    
+
   when: upgrade_required
