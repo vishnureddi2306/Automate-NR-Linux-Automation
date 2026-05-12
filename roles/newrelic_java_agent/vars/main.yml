@@ -2,7 +2,7 @@ application_configs:
 
   standard:
     tomcat_path: /opt/tomcat
-    setenv_template: setenv_standard.sh.j2
+    setenv_template: setenv.sh.j2
     restart_handler: restart standard tomcat
 
   ProSAM:
