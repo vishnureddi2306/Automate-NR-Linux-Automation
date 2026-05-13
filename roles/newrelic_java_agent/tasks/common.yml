@@ -9,12 +9,16 @@
     msg: "Unsupported application_type"
   when: application_type not in application_configs
 
+- name: Validate application Name
+  fail:
+    msg: "Unsupported application_name"
+  when: application_name is not defined  
+
 - name: Normalize variables
   set_fact:
     env_tag: "{{ input_tag_Environment | default('unknown') | lower }}"
     inst_tag: "{{ input_tag_institution | default('unknown') }}"
-    app_name: "{{ input_app_name | default('unknown') }}"
-
+    
 - name: Select New Relic license key
   set_fact:
     newrelic_license_key: >-
