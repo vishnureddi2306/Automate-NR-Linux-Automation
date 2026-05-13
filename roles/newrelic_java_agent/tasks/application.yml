@@ -1,4 +1,19 @@
 ---
+- name: Ensure /sigma directory exists
+  file:
+    path: /sigma
+    state: directory
+    mode: '0755'
+  when: application_type == "ProSAM"
+
+- name: Create /sigma/tomcat symlink
+  file:
+    src: /opt/tomcat
+    dest: /sigma/tomcat
+    state: link
+    force: yes
+  when: application_type == "ProSAM"
+
 - name: Create startup integration
   template:
     src: "{{ app_config.setenv_template }}"
