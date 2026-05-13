@@ -1,6 +1,0 @@
-- name: Install New Relic Java Agent on Linux servers and configure Tomcat
-  hosts: all
-  become: true
-
-  roles:
-    - newrelic_java_agent
