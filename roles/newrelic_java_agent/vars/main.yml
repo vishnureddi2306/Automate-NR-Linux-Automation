@@ -10,3 +10,9 @@ application_configs:
     setenv_template: setenv_prosam.sh.j2
     restart_handler: restart prosam services
     service_user: sigqa
+
+  SSB9:
+    tomcat_path: /u01/tomcat/8100
+    setenv_template: setenv_ssb9.sh.j2
+    restart_handler: restart_ssb9 
+    service_user: sigqa
