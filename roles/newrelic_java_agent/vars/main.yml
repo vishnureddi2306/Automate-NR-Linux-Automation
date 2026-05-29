@@ -14,5 +14,5 @@ application_configs:
   SSB9:
     tomcat_path: /u01/tomcat/8100
     setenv_template: setenv_ssb9.sh.j2
-    restart_handler: restart_ssb9 
+    restart_handler: restart_ssb9 services
     service_user: sigqa
