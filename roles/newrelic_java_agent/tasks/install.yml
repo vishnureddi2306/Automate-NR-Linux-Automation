@@ -42,11 +42,4 @@
         regexp: '^\s*license_key:'
         line: "  license_key: {{ newrelic_license_key }}"
 
-    - name: Update New Relic application name
-      lineinfile:
-        path: /opt/newrelic/newrelic.yml
-        regexp: '^\s*app_name:'
-        line: "  app_name: {{ application_name }}"
-        firstmatch: yes    
-
   when: upgrade_required
