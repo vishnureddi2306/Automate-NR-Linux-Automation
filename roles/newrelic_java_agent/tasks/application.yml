@@ -1,11 +1,4 @@
 ---
-- name: Ensure /sigma directory exists
-  file:
-    path: /sigma
-    state: directory
-    mode: '0755'
-  when: application_type == "ProSAM"
-
 - name: Create /sigma/tomcat symlink
   file:
     src: /opt/tomcat
@@ -13,6 +6,13 @@
     state: link
     force: yes
   when: application_type == "ProSAM"
+
+- name: Ensure SSB9 scripts directory exists
+  file:
+    path: /u01/tomcat/scripts
+    state: directory
+    mode: '0755'
+  when: application_type == "SSB9"  
 
 - name: Create startup integration
   template:
