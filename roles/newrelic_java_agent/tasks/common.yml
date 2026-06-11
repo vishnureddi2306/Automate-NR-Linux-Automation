@@ -2,7 +2,7 @@
 - name: Validate New Relic version input
   fail:
     msg: "nr_version not provided"
-  when: nr_version is not defined
+  when: nr_version is unknown
 
 - name: Validate application type
   fail:
