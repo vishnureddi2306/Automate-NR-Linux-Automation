@@ -3,7 +3,7 @@
 - name: Validate nr_version
   fail:
     msg: "nr_version not provided"
-  when: nr_version is not defined
+  when: nr_version is not defined or (nr_version | string | trim | length == 0)
 
 - name: Validate application_type
   fail:
