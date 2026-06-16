@@ -1,4 +1,4 @@
 ---
 - import_tasks: common.yml
 - import_tasks: install.yml
-- import_tasks: application.yml
+- include_tasks: "applications/{{ application_type | lower }}.yml"
