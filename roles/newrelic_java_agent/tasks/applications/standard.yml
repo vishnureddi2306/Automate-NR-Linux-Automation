@@ -1,0 +1,8 @@
+---
+- name: Create standard setenv
+  template:
+    src: setenv.sh.j2
+    dest: /opt/tomcat/bin/setenv.sh
+    mode: "0644"
+  when: upgrade_required
+  notify: restart standard tomcat
