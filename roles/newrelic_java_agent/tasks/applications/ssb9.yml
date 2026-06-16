@@ -1,0 +1,21 @@
+---
+- name: Ensure u01 exists
+  file:
+    path: /u01/tomcat/scripts
+    state: directory
+    mode: "0644"
+
+- name: Create SSB9 tomcat symlink
+  file:
+    src: /opt/tomcat
+    dest: /u01/tomcat/8100
+    state: link
+    force: yes
+
+- name: Create SSB9 setenv
+  template:
+    src: setenv_ssb9.sh.j2
+    dest: /u01/tomcat/8100/bin/setenv.sh
+    mode: "0644"
+  when: upgrade_required
+  notify: restart ssb9 services
