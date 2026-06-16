@@ -9,7 +9,7 @@
 
 - name: restart prosam services
   become_user: sigqa
-  become: sudo
+  become: true
   shell: |
     /sigma/tomcat/bin/catalina.sh stop || true
 
