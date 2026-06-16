@@ -1,0 +1,21 @@
+---
+- name: Ensure sigma exists
+  file:
+    path: /sigma
+    state: directory
+    mode: "0644"
+
+- name: Create tomcat symlink
+  file:
+    src: /opt/tomcat
+    dest: /sigma/tomcat
+    state: link
+    force: yes
+
+- name: Create ProSAM setenv
+  template:
+    src: setenv_prosam.sh.j2
+    dest: /sigma/tomcat/bin/setenv.sh
+    mode: "0644"
+  when: upgrade_required
+  notify: restart prosam services
