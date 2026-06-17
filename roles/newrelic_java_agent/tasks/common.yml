@@ -12,11 +12,6 @@
     - application_type is not defined
     - application_type | lower not in ['standard','prosam','ssb9']
 
-- name: Validate application_name
-  fail:
-    msg: "application_name not provided"
-  when: application_name is not defined
-
 - name: Normalize variables
   set_fact:
     env_tag: "{{ input_tag_Environment | lower }}"
