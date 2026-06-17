@@ -1,4 +1,2 @@
-export CATALINA_OPTS="$CATALINA_OPTS \
--javaagent:/opt/newrelic/newrelic.jar \
--Dnewrelic.config.app_name=SS9Test \
+export CATALINA_OPTS="$CATALINA_OPTS \-javaagent:/opt/newrelic/newrelic.jar \-Dnewrelic.config.app_name=SS9Test \
 -Dnewrelic.config.labels='environment:{{ env_tag }};institution:{{ inst_tag }};service:servicetag;team:teamtag'"
