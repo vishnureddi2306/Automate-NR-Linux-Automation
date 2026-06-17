@@ -8,8 +8,8 @@
     executable: /bin/bash
 
 - name: restart prosam services
-  become_user: sigqa
-  become: true
+    become: true
+    become_user: sigqa
   shell: |
     /sigma/tomcat/bin/catalina.sh stop || true
 
