@@ -16,7 +16,7 @@
   set_fact:
     env_tag: "{{ input_tag_Environment | lower }}"
     inst_tag: "{{ input_tag_institution }}"
-    app_name: "{{ application_name }}"
+    nr_version: "{{ nr_version }}"
 
 - name: Select license key
   set_fact:
