@@ -8,20 +8,20 @@
     executable: /bin/bash
 
 - name: restart prosam services
-    become_user: sigqa
-    become: sudo
+  become: true
+  become_user: sigqa
   shell: |
-    /sigma/tomcat/bin/catalina.sh stop || true
+    sudo /sigma/tomcat/bin/catalina.sh stop || true
 
-    /sigma/qa/bin/ixsqps_stop || true
-    /sigma/qa/bin/ssiapix_stop || true
+    sudo /sigma/qa/bin/ixsqps_stop || true
+    sudo /sigma/qa/bin/ssiapix_stop || true
 
     sleep 5
 
-    /sigma/qa/bin/ssiapix_start
-    /sigma/qa/bin/ixsqps_start
+    sudo /sigma/qa/bin/ssiapix_start
+    sudo /sigma/qa/bin/ixsqps_start
 
-    /sigma/tomcat/bin/catalina.sh start
+    sudo /sigma/tomcat/bin/catalina.sh start
   args:
     executable: /bin/bash
 
