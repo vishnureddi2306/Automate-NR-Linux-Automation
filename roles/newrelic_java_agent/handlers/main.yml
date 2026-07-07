@@ -29,8 +29,8 @@
   become: true
   become_user: sigqa
   shell: |
-    /u01/tomcat/scripts/stop_ssb9.sh || true
+    sudo /u01/tomcat/scripts/stop_ssb9.sh || true
     sleep 10
-    /u01/tomcat/scripts/start_ssb9.sh     
+    sudo /u01/tomcat/scripts/start_ssb9.sh     
   args:
     executable: /bin/bash  
