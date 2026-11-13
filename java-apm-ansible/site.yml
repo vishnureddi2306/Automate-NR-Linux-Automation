@@ -1,0 +1,10 @@
+---
+- name: Manage New Relic Java APM
+  hosts: banner_java
+  gather_facts: false
+  become: true
+  serial: 1
+  vars_files:
+    - vars/services.yml
+  roles:
+    - java_apm

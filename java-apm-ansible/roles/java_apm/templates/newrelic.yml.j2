@@ -1,0 +1,6 @@
+common: &default_settings
+  license_key: '{{ nr_license_key }}'
+  app_name: 'Configured per JVM startup'
+  log_level: info
+production:
+  <<: *default_settings

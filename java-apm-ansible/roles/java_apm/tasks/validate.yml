@@ -1,0 +1,112 @@
+---
+- name: Check target is present in central YAML
+  ansible.builtin.assert:
+    that:
+      - inventory_hostname in java_apm.servers
+    fail_msg: "Host {{ inventory_hostname }} is absent from vars/services.yml"
+
+- name: Resolve host configuration
+  ansible.builtin.set_fact:
+    server_config: "{{ java_apm.servers[inventory_hostname] }}"
+    agent_config: "{{ java_apm.agent }}"
+
+- name: Validate required host fields
+  ansible.builtin.assert:
+    that:
+      - server_config.environment is defined
+      - server_config.environment in ['PROD', 'NPROD']
+      - server_config.institution is defined
+      - server_config.service_tag is defined
+      - server_config.application_type is defined
+      - server_config.team is defined
+      - server_config.services is defined
+      - server_config.services | length > 0
+      - nr_license_key is defined
+      - nr_license_key | length > 0
+    fail_msg: "Missing host fields or AWX-injected nr_license_key"
+  no_log: true
+
+- name: Resolve restart settings
+  ansible.builtin.set_fact:
+    restart_config: "{{ server_config.restart | default(java_apm.standard_banner) }}"
+
+- name: Validate restart policy
+  ansible.builtin.assert:
+    that:
+      - restart_config.user is defined
+      - restart_config.scripts_path is defined
+      - restart_config.stop_script is defined
+      - restart_config.start_script is defined
+      - restart_config.status_script is defined
+      - "'walden' not in (server_config.service_tag | lower) or server_config.restart is defined"
+      - "'walden' not in (server_config.service_tag | lower) or restart_config.user == 'tomcat'"
+      - "'walden' in (server_config.service_tag | lower) or restart_config.user == 'app'"
+
+- name: Validate service definitions
+  ansible.builtin.assert:
+    that:
+      - item.name is defined
+      - item.name | length > 0
+      - item.setenv_path is defined
+      - item.setenv_path is match('^/.+/setenv\.sh$')
+    fail_msg: "Invalid service entry: {{ item }}"
+  loop: "{{ server_config.services }}"
+  loop_control:
+    label: "{{ item.name | default('unknown') }}"
+
+- name: Reject duplicate startup destinations
+  ansible.builtin.assert:
+    that:
+      - "(server_config.services | map(attribute='setenv_path') | list | unique | length) == (server_config.services | length)"
+
+- name: Verify script directory
+  ansible.builtin.stat:
+    path: "{{ restart_config.scripts_path }}"
+  register: script_directory
+
+- name: Assert script directory exists
+  ansible.builtin.assert:
+    that:
+      - script_directory.stat.isdir | default(false)
+
+- name: Verify restart scripts exist
+  ansible.builtin.stat:
+    path: "{{ restart_config.scripts_path }}/{{ item }}"
+  loop:
+    - "{{ restart_config.stop_script }}"
+    - "{{ restart_config.start_script }}"
+    - "{{ restart_config.status_script }}"
+  register: script_stats
+
+- name: Assert restart scripts are executable
+  ansible.builtin.assert:
+    that:
+      - item.stat.isreg | default(false)
+      - item.stat.executable | default(false)
+  loop: "{{ script_stats.results }}"
+  loop_control:
+    label: "{{ item.item }}"
+
+- name: Verify all setenv parent directories exist
+  ansible.builtin.stat:
+    path: "{{ item.setenv_path | dirname }}"
+  loop: "{{ server_config.services }}"
+  loop_control:
+    label: "{{ item.setenv_path | dirname }}"
+  register: parent_stats
+
+- name: Assert setenv parent directories exist
+  ansible.builtin.assert:
+    that:
+      - item.stat.isdir | default(false)
+  loop: "{{ parent_stats.results }}"
+  loop_control:
+    label: "{{ item.item.setenv_path }}"
+
+- name: Check Java availability
+  ansible.builtin.command: java -version
+  changed_when: false
+
+- name: Check unzip availability
+  ansible.builtin.command: unzip -v
+  changed_when: false

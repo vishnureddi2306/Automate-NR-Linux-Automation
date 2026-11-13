@@ -1,0 +1,52 @@
+---
+java_apm:
+  agent:
+    install_path: /opt/newrelic
+    jar_path: /opt/newrelic/newrelic.jar
+    download_url: https://download.newrelic.com/newrelic/java-agent/newrelic-agent/current/newrelic-java.zip
+  standard_banner:
+    user: app
+    scripts_path: /opt/banner/scripts  # REPLACE
+    stop_script: stop_apps.sh
+    start_script: start_app.sh
+    status_script: status_apps.sh
+  servers:
+    banner-ap01:
+      environment: NPROD
+      institution: CU
+      service_tag: Banner CU
+      application_type: SSB9
+      team: Banner
+      services:
+        - name: CU SSB9 Admin
+          setenv_path: /opt/ssb9/admin/bin/setenv.sh  # REPLACE
+        - name: CU SSB9 Student
+          setenv_path: /opt/ssb9/student/bin/setenv.sh  # REPLACE
+    banner-ap02:
+      environment: NPROD
+      institution: CU
+      service_tag: Banner CU
+      application_type: SSB9
+      team: Banner
+      services:
+        - name: CU SSB9 Admin
+          setenv_path: /opt/ssb9/admin/bin/setenv.sh  # REPLACE
+        - name: CU SSB9 Student
+          setenv_path: /opt/ssb9/student/bin/setenv.sh  # REPLACE
+    banner-walden-ap01:
+      environment: PROD
+      institution: WU
+      service_tag: Banner Walden
+      application_type: SSB9
+      team: Banner
+      restart:
+        user: tomcat
+        scripts_path: /sigma/ssb9/scripts  # REPLACE
+        stop_script: stop-ssb9.sh       # REPLACE
+        start_script: start-ssb9.sh     # REPLACE
+        status_script: status-ssb9.sh   # REPLACE
+      services:
+        - name: WU SSB9 Admin
+          setenv_path: /sigma/ssb9/admin/bin/setenv.sh  # REPLACE
+        - name: WU SSB9 Student
+          setenv_path: /sigma/ssb9/student/bin/setenv.sh  # REPLACE

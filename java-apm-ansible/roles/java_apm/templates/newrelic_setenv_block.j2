@@ -1,0 +1,4 @@
+# This file must be sourced by the actual Java/Tomcat launcher.
+export NEW_RELIC_APP_NAME={{ service.name | quote }}
+export NEW_RELIC_LABELS={{ ('environment:' ~ server_config.environment ~ ';institution:' ~ server_config.institution ~ ';service_tag:' ~ server_config.service_tag ~ ';team:' ~ server_config.team) | quote }}
+export JAVA_OPTS="${JAVA_OPTS:-} -javaagent:{{ agent_config.jar_path }}"

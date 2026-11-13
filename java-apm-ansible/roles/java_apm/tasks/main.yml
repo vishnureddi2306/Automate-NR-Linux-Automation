@@ -1,0 +1,31 @@
+---
+- name: Validate configuration and prerequisites
+  ansible.builtin.import_tasks: validate.yml
+
+- name: Detect agent and stage current release
+  ansible.builtin.import_tasks: detect.yml
+
+- name: Install or upgrade agent when needed
+  ansible.builtin.include_tasks: install.yml
+  when: agent_change_required | bool
+
+- name: Configure Java service startup files
+  ansible.builtin.import_tasks: configure.yml
+
+- name: Determine whether restart is required
+  ansible.builtin.set_fact:
+    restart_required: "{{ (agent_change_required | bool) or (setenv_changes.changed | default(false)) or (license_changes.changed | default(false)) }}"
+
+- name: Restart and verify application
+  ansible.builtin.include_tasks: restart.yml
+  when: restart_required | bool
+
+- name: Remove downloaded staging directory
+  ansible.builtin.file:
+    path: "{{ nr_staging.path }}"
+    state: absent
+  when: nr_staging is defined
+
+- name: Report outcome
+  ansible.builtin.debug:
+    msg: "{{ inventory_hostname }}: installed={{ installed_version | default('missing') }}, latest={{ latest_version }}, restart_required={{ restart_required }}"

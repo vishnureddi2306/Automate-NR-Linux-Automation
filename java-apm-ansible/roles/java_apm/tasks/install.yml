@@ -1,0 +1,34 @@
+---
+- name: Ensure agent installation directory exists
+  ansible.builtin.file:
+    path: "{{ agent_config.install_path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Back up existing agent jar if present
+  ansible.builtin.copy:
+    src: "{{ agent_config.jar_path }}"
+    dest: "{{ agent_config.jar_path }}.pre-{{ latest_version }}.bak"
+    remote_src: true
+    mode: '0644'
+  when: installed_jar.stat.exists
+
+- name: Install agent JAR from staged release
+  ansible.builtin.copy:
+    src: "{{ nr_staging.path }}/newrelic/newrelic.jar"
+    dest: "{{ agent_config.jar_path }}"
+    remote_src: true
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Install matching New Relic API JAR when available
+  ansible.builtin.copy:
+    src: "{{ nr_staging.path }}/newrelic/newrelic-api.jar"
+    dest: "{{ agent_config.install_path }}/newrelic-api.jar"
+    remote_src: true
+    owner: root
+    group: root
+    mode: '0644'
