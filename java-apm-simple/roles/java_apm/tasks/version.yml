@@ -1,0 +1,54 @@
+---
+- name: Check installed JAR
+  ansible.builtin.stat:
+    path: "{{ agent_dir }}/newrelic.jar"
+  register: agent_file
+
+- name: Read installed version
+  ansible.builtin.command:
+    argv: [java, -jar, "{{ agent_dir }}/newrelic.jar", -v]
+  register: installed_output
+  changed_when: false
+  when: agent_file.stat.exists
+
+- name: Create temporary directory
+  ansible.builtin.tempfile:
+    state: directory
+    prefix: nr-java-
+  register: temp_dir
+
+- name: Download latest agent
+  ansible.builtin.get_url:
+    url: "{{ java_apm.download_url }}"
+    dest: "{{ temp_dir.path }}/agent.zip"
+    mode: '0600'
+    timeout: 90
+
+- name: Unzip latest agent
+  ansible.builtin.unarchive:
+    src: "{{ temp_dir.path }}/agent.zip"
+    dest: "{{ temp_dir.path }}"
+    remote_src: true
+
+- name: Read latest version
+  ansible.builtin.command:
+    argv: [java, -jar, "{{ temp_dir.path }}/newrelic/newrelic.jar", -v]
+  register: latest_output
+  changed_when: false
+
+- name: Save version numbers
+  ansible.builtin.set_fact:
+    installed_version: "{{ ((installed_output.stdout | default('')) ~ ' ' ~ (installed_output.stderr | default(''))) | regex_search('[0-9]+[.][0-9]+[.][0-9]+') | default('', true) }}"
+    latest_version: "{{ (latest_output.stdout ~ ' ' ~ latest_output.stderr) | regex_search('[0-9]+[.][0-9]+[.][0-9]+') | default('', true) }}"
+
+- name: Require valid versions
+  ansible.builtin.assert:
+    that:
+      - latest_version | length > 0
+      - not agent_file.stat.exists or installed_version | length > 0
+      - not agent_file.stat.exists or installed_version is version(latest_version, '<=')
+    fail_msg: "Could not compare versions safely. No agent will be replaced."
+
+- name: Decide if installation is needed
+  ansible.builtin.set_fact:
+    update_agent: "{{ (not agent_file.stat.exists) or (installed_version is version(latest_version, '<')) }}"

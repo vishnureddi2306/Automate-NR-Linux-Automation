@@ -1,0 +1,4 @@
+# New Relic APM settings for {{ service.name }}
+export NEW_RELIC_APP_NAME={{ service.name | quote }}
+export NEW_RELIC_LABELS={{ ('environment:' ~ server.environment ~ ';institution:' ~ server.institution ~ ';service_tag:' ~ server.service_tag ~ ';team:' ~ server.team) | quote }}
+export JAVA_OPTS="${JAVA_OPTS:-} -javaagent:{{ agent_dir }}/newrelic.jar"

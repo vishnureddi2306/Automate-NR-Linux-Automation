@@ -1,0 +1,73 @@
+---
+- name: Check required settings
+  ansible.builtin.assert:
+    that:
+      - server.environment in ['PROD', 'NPROD']
+      - server.institution | length > 0
+      - server.service_tag | length > 0
+      - server.application | length > 0
+      - server.team | length > 0
+      - server.services | length > 0
+      - restart.user | length > 0
+      - restart.directory is match('^/')
+      - nr_license_key is defined
+      - nr_license_key | length > 0
+      - "'walden' not in (server.service_tag | lower) or (server.restart is defined and restart.user == 'tomcat')"
+    fail_msg: "Check services.yml and the AWX license credential"
+  no_log: true
+
+- name: Check each service path
+  ansible.builtin.assert:
+    that:
+      - item.name | length > 0
+      - item.setenv is match('^/.+/setenv\.sh$')
+  loop: "{{ server.services }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Reject duplicate setenv paths
+  ansible.builtin.assert:
+    that:
+      - "(server.services | map(attribute='setenv') | list | unique | length) == (server.services | length)"
+
+- name: Check startup directories
+  ansible.builtin.stat:
+    path: "{{ item.setenv | dirname }}"
+  loop: "{{ server.services }}"
+  register: setenv_dirs
+
+- name: Require existing startup directories
+  ansible.builtin.assert:
+    that:
+      - item.stat.isdir | default(false)
+    fail_msg: "Missing directory for {{ item.item.setenv }}"
+  loop: "{{ setenv_dirs.results }}"
+  loop_control:
+    label: "{{ item.item.setenv }}"
+
+- name: Check restart scripts
+  ansible.builtin.stat:
+    path: "{{ restart.directory }}/{{ item }}"
+  loop:
+    - "{{ restart.stop }}"
+    - "{{ restart.start }}"
+    - "{{ restart.status }}"
+  register: restart_scripts
+
+- name: Require executable restart scripts
+  ansible.builtin.assert:
+    that:
+      - item.stat.isreg | default(false)
+      - item.stat.executable | default(false)
+    fail_msg: "Missing or non-executable script: {{ item.item }}"
+  loop: "{{ restart_scripts.results }}"
+  loop_control:
+    label: "{{ item.item }}"
+
+- name: Check Java
+  ansible.builtin.command: java -version
+  changed_when: false
+
+- name: Check unzip
+  ansible.builtin.command: unzip -v
+  changed_when: false

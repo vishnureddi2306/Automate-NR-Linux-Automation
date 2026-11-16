@@ -1,0 +1,54 @@
+---
+java_apm:
+  agent_dir: /opt/newrelic
+  download_url: https://download.newrelic.com/newrelic/java-agent/newrelic-agent/current/newrelic-java.zip
+
+  standard_restart:
+    user: app
+    directory: /opt/banner/scripts  # CHANGE
+    stop: stop_apps.sh
+    start: start_app.sh
+    status: status_apps.sh
+
+  servers:
+    banner-ap01:
+      environment: NPROD
+      institution: CU
+      service_tag: Banner CU
+      application: SSB9
+      team: Banner
+      services:
+        - name: CU SSB9 Admin
+          setenv: /opt/ssb9/admin/bin/setenv.sh  # CHANGE
+        - name: CU SSB9 Student
+          setenv: /opt/ssb9/student/bin/setenv.sh  # CHANGE
+
+    banner-ap02:
+      environment: NPROD
+      institution: CU
+      service_tag: Banner CU
+      application: SSB9
+      team: Banner
+      services:
+        - name: CU SSB9 Admin
+          setenv: /opt/ssb9/admin/bin/setenv.sh  # CHANGE
+        - name: CU SSB9 Student
+          setenv: /opt/ssb9/student/bin/setenv.sh  # CHANGE
+
+    banner-walden-ap01:
+      environment: PROD
+      institution: WU
+      service_tag: Banner Walden
+      application: SSB9
+      team: Banner
+      restart:
+        user: tomcat
+        directory: /sigma/ssb9/scripts  # CHANGE
+        stop: stop-ssb9.sh            # CHANGE
+        start: start-ssb9.sh          # CHANGE
+        status: status-ssb9.sh        # CHANGE
+      services:
+        - name: WU SSB9 Admin
+          setenv: /sigma/ssb9/admin/bin/setenv.sh  # CHANGE
+        - name: WU SSB9 Student
+          setenv: /sigma/ssb9/student/bin/setenv.sh  # CHANGE
