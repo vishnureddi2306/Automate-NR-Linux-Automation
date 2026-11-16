@@ -1,6 +1,0 @@
-common: &default_settings
-  license_key: {{ nr_license_key | to_json }}
-  app_name: 'Configured by setenv.sh'
-  log_level: info
-production:
-  <<: *default_settings
