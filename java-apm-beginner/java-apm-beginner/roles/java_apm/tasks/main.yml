@@ -1,0 +1,18 @@
+---
+- name: Read server settings
+  ansible.builtin.set_fact:
+    server: "{{ java_apm.servers[inventory_hostname] }}"
+
+- name: Select restart scripts
+  ansible.builtin.set_fact:
+    scripts: "{{ server.scripts | default(java_apm.standard_scripts) }}"
+
+- name: Check and install Java agent
+  ansible.builtin.import_tasks: agent.yml
+
+- name: Configure setenv files
+  ansible.builtin.import_tasks: setenv.yml
+
+- name: Restart services if something changed
+  ansible.builtin.import_tasks: restart.yml
+  when: agent_changed or setenv_result.changed or license_result.changed

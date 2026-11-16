@@ -1,0 +1,34 @@
+---
+- name: Stop application services
+  ansible.builtin.command:
+    cmd: "./{{ scripts.stop }}"
+    chdir: "{{ scripts.path }}"
+  become: true
+  become_user: "{{ scripts.user }}"
+
+- name: Wait five seconds
+  ansible.builtin.pause:
+    seconds: 5
+
+- name: Start application services
+  ansible.builtin.command:
+    cmd: "./{{ scripts.start }}"
+    chdir: "{{ scripts.path }}"
+  become: true
+  become_user: "{{ scripts.user }}"
+
+- name: Check application status
+  ansible.builtin.command:
+    cmd: "./{{ scripts.status }}"
+    chdir: "{{ scripts.path }}"
+  become: true
+  become_user: "{{ scripts.user }}"
+  register: app_status
+  changed_when: false
+  until: app_status.rc == 0
+  retries: 12
+  delay: 10
+
+- name: Display application status
+  ansible.builtin.debug:
+    var: app_status.stdout_lines

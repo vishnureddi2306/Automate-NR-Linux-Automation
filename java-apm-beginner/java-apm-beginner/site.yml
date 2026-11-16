@@ -1,0 +1,9 @@
+---
+- name: Install New Relic Java APM
+  hosts: all
+  become: true
+  gather_facts: false
+  vars_files:
+    - vars/services.yml
+  roles:
+    - java_apm

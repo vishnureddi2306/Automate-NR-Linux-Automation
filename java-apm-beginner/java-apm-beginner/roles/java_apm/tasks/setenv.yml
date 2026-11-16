@@ -1,0 +1,35 @@
+---
+- name: Check existing New Relic startup settings
+  ansible.builtin.shell: >
+    if [ -f "{{ item.setenv }}" ]; then
+      grep -q -- '-javaagent:.*newrelic.jar' "{{ item.setenv }}" &&
+      ! grep -q 'BEGIN NEW RELIC APM' "{{ item.setenv }}"
+    else
+      exit 1
+    fi
+  loop: "{{ server.services }}"
+  register: existing_agents
+  changed_when: false
+  failed_when: false
+
+- name: Stop if an unmanaged New Relic agent is found
+  ansible.builtin.assert:
+    that:
+      - item.rc != 0
+    fail_msg: "Review existing New Relic settings in {{ item.item.setenv }}"
+  loop: "{{ existing_agents.results }}"
+  loop_control:
+    label: "{{ item.item.setenv }}"
+
+- name: Add New Relic settings to setenv files
+  ansible.builtin.blockinfile:
+    path: "{{ service.setenv }}"
+    create: true
+    backup: true
+    marker: "# {mark} NEW RELIC APM"
+    block: "{{ lookup('template', 'newrelic_setenv.j2') }}"
+  loop: "{{ server.services }}"
+  loop_control:
+    loop_var: service
+    label: "{{ service.name }}"
+  register: setenv_result

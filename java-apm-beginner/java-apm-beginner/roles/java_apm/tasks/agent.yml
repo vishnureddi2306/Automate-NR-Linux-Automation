@@ -1,0 +1,114 @@
+---
+- name: Create temporary directory
+  ansible.builtin.tempfile:
+    state: directory
+    prefix: java-apm-
+  register: temp_dir
+
+- name: Download latest Java agent
+  ansible.builtin.get_url:
+    url: "{{ java_apm.download_url }}"
+    dest: "{{ temp_dir.path }}/newrelic.zip"
+    mode: '0600'
+
+- name: Extract downloaded agent
+  ansible.builtin.unarchive:
+    src: "{{ temp_dir.path }}/newrelic.zip"
+    dest: "{{ temp_dir.path }}"
+    remote_src: true
+
+- name: Check installed agent
+  ansible.builtin.stat:
+    path: "{{ java_apm.agent_path }}/newrelic.jar"
+  register: agent_file
+
+- name: Get installed version
+  ansible.builtin.command:
+    argv: [java, -jar, "{{ java_apm.agent_path }}/newrelic.jar", -v]
+  register: installed
+  changed_when: false
+  when: agent_file.stat.exists
+
+- name: Get latest version
+  ansible.builtin.command:
+    argv: [java, -jar, "{{ temp_dir.path }}/newrelic/newrelic.jar", -v]
+  register: latest
+  changed_when: false
+
+- name: Save version numbers
+  ansible.builtin.set_fact:
+    old_version: "{{ ((installed.stdout | default('')) ~ ' ' ~ (installed.stderr | default(''))) | regex_search('[0-9]+\.[0-9]+\.[0-9]+') | default('', true) }}"
+    new_version: "{{ (latest.stdout ~ ' ' ~ latest.stderr) | regex_search('[0-9]+\.[0-9]+\.[0-9]+') | default('', true) }}"
+
+- name: Check version information
+  ansible.builtin.assert:
+    that:
+      - new_version | length > 0
+      - not agent_file.stat.exists or old_version | length > 0
+      - not agent_file.stat.exists or old_version is version(new_version, '<=')
+    fail_msg: Could not read or compare the Java agent versions.
+
+- name: Check whether installation is needed
+  ansible.builtin.set_fact:
+    install_agent: "{{ not agent_file.stat.exists or old_version is version(new_version, '<') }}"
+
+- name: Create New Relic directory
+  ansible.builtin.file:
+    path: "{{ java_apm.agent_path }}"
+    state: directory
+    mode: '0755'
+
+- name: Install or upgrade Java agent
+  ansible.builtin.copy:
+    src: "{{ temp_dir.path }}/newrelic/newrelic.jar"
+    dest: "{{ java_apm.agent_path }}/newrelic.jar"
+    remote_src: true
+    mode: '0644'
+    backup: true
+  when: install_agent
+  register: agent_copy
+
+- name: Save agent change status
+  ansible.builtin.set_fact:
+    agent_changed: "{{ agent_copy.changed | default(false) }}"
+
+- name: Check New Relic configuration file
+  ansible.builtin.stat:
+    path: "{{ java_apm.agent_path }}/newrelic.yml"
+  register: config_file
+
+- name: Create New Relic configuration if missing
+  ansible.builtin.copy:
+    dest: "{{ java_apm.agent_path }}/newrelic.yml"
+    content: |
+      common: &default_settings
+        license_key: ''
+        app_name: 'Java Application'
+        log_level: info
+      production:
+        <<: *default_settings
+    owner: root
+    group: "{{ scripts.user }}"
+    mode: '0640'
+  when: not config_file.stat.exists
+  no_log: true
+
+- name: Set New Relic license key
+  ansible.builtin.lineinfile:
+    path: "{{ java_apm.agent_path }}/newrelic.yml"
+    regexp: '^  license_key:'
+    line: "  license_key: {{ nr_license_key | to_json }}"
+  register: license_result
+  no_log: true
+
+- name: Set configuration permissions
+  ansible.builtin.file:
+    path: "{{ java_apm.agent_path }}/newrelic.yml"
+    owner: root
+    group: "{{ scripts.user }}"
+    mode: '0640'
+
+- name: Remove temporary files
+  ansible.builtin.file:
+    path: "{{ temp_dir.path }}"
+    state: absent
